@@ -1,0 +1,6 @@
+[tools]
+go = "1.26"
+
+[tasks]
+build = "go build ."
+

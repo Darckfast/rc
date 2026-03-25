@@ -19,7 +19,12 @@ func InitPins() {
 		panic(err)
 	}
 
-	os.WriteFile(SERVO_PWM+"export", []byte("0"), 0200)
+	err = os.WriteFile(SERVO_PWM+"export", []byte("0"), 0200)
+
+	if err != nil {
+		panic(err)
+	}
+
 	_, err = os.Stat(SERVO_PWM + "pwm0")
 
 	if err != nil {

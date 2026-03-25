@@ -1,6 +1,6 @@
 //go:build windows
 
-package shared
+package client
 
 import (
 	"log"

@@ -11,7 +11,7 @@ import (
 )
 
 func Connect() {
-	addr, err := net.ResolveUDPAddr("udp", "localhost:8080")
+	addr, err := net.ResolveUDPAddr("udp", "10.0.0.35:8080")
 	if err != nil {
 		panic(err)
 	}
@@ -22,8 +22,10 @@ func Connect() {
 	}
 	defer conn.Close()
 
-	conn.SetWriteDeadline(time.Now().Add(100 * time.Millisecond))
-	for {
+	ticker := time.NewTicker(time.Second / 60)
+	defer ticker.Stop()
+
+	for range ticker.C {
 		state := GetControllerState()
 
 		if state == nil {
@@ -36,6 +38,7 @@ func Connect() {
 			continue
 		}
 
+		conn.SetWriteDeadline(time.Now().Add(50 * time.Millisecond))
 		_, err = conn.Write(buf.Bytes())
 		if err != nil {
 			log.Printf("Send failed: %v", err)

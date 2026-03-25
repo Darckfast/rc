@@ -25,6 +25,8 @@ func Serve() {
 	buffer := make([]byte, 1024)
 	log.Println("Listening to udp://localhost:8080")
 
+	InitPins()
+
 	for {
 		n, clientAddr, err := conn.ReadFromUDP(buffer)
 

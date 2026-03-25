@@ -6,7 +6,7 @@ import (
 )
 
 func Serve() {
-	addr, err := net.ResolveUDPAddr("udp", "localhost:8080")
+	addr, err := net.ResolveUDPAddr("udp", "0.0.0.0:8080")
 
 	if err != nil {
 		panic(err)

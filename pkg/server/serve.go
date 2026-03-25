@@ -23,12 +23,12 @@ func Serve() {
 	defer conn.Close()
 
 	buffer := make([]byte, 1024)
-	log.Println("Listening to udp://localhost:8080")
 
 	InitPins()
 
+	log.Println("Listening to udp://0.0.0.0:8080")
 	for {
-		n, clientAddr, err := conn.ReadFromUDP(buffer)
+		n, _, err := conn.ReadFromUDP(buffer)
 
 		if err != nil {
 			log.Println("error reading packet", err)
@@ -45,6 +45,6 @@ func Serve() {
 			continue
 		}
 
-		log.Printf("Got message from %s: %v\n", clientAddr, state)
+		Move(&state)
 	}
 }

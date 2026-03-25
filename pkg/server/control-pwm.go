@@ -30,25 +30,25 @@ func InitPins() {
 		panic(err)
 	}
 
-	err = os.WriteFile(servo_pwm+"pwm0/polarity", []byte(servo_polarity), 0200)
+	err = os.WriteFile(servo_pwm+"pwm0/polarity", []byte(servo_polarity), 0644)
 
 	if err != nil {
 		panic(err)
 	}
 
-	err = os.WriteFile(servo_pwm+"pwm0/period", []byte(servo_period), 0200)
+	err = os.WriteFile(servo_pwm+"pwm0/period", []byte(servo_period), 0644)
 
 	if err != nil {
 		panic(err)
 	}
 
-	err = os.WriteFile(servo_pwm+"pwm0/duty_cycle", []byte(servo_neutral_duty_cycle), 0200)
+	err = os.WriteFile(servo_pwm+"pwm0/duty_cycle", []byte(servo_neutral_duty_cycle), 0644)
 
 	if err != nil {
 		panic(err)
 	}
 
-	err = os.WriteFile(servo_pwm+"pwm0/enable", []byte("1"), 0200)
+	err = os.WriteFile(servo_pwm+"pwm0/enable", []byte("1"), 0644)
 
 	if err != nil {
 		panic(err)

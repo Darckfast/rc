@@ -102,4 +102,11 @@ func Move(gamepad *shared.NormalizedGamepad) {
 	// limits steering to +/- 2k in duty cycle
 	escCycle := int(math.Round(gamepad.Tl*20_000)) + neutral_duty_cycle
 	log.Printf("%d\n", escCycle)
+	err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)
+
+	if err != nil {
+		// disable pwm and exit the process
+		os.WriteFile(esc_pwm_pin_16+"pwm0/enable", []byte("0"), 0644)
+		panic(err)
+	}
 }

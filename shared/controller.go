@@ -5,7 +5,6 @@ package shared
 import (
 	"log"
 	"math"
-	"rc/shared"
 	"syscall"
 	"unsafe"
 )
@@ -43,6 +42,16 @@ type Gamepad struct {
 	right_y       int16
 }
 
+type NormalizedGamepad struct {
+	Button_mask uint16
+	Tl          float64
+	Tr          float64
+	Lx          float64
+	Ly          float64
+	Rx          float64
+	Ry          float64
+}
+
 func init() {
 	dll, err := syscall.LoadDLL(xinput_dll)
 
@@ -62,15 +71,15 @@ const xinput_gamepad_left_thumb_deadzone = 7849
 const xinput_gamepad_right_thumb_deadzone = 8689
 const xinput_gamepad_trigger_threshold = 30
 
-var normalizedGamepad shared.NormalizedGamepad
+var normalizedGamepad NormalizedGamepad
 
-func calculateDeadZone(gamepad *Gamepad) *shared.NormalizedGamepad {
+func calculateDeadZone(gamepad *Gamepad) *NormalizedGamepad {
 	lx, ly, _ := normalizeThumb(gamepad.left_x, gamepad.left_y, xinput_gamepad_left_thumb_deadzone)
 	rx, ry, _ := normalizeThumb(gamepad.right_x, gamepad.right_y, xinput_gamepad_right_thumb_deadzone)
 	_, tl := normalizeTrigger(gamepad.left_trigger, xinput_gamepad_trigger_threshold)
 	_, tr := normalizeTrigger(gamepad.right_trigger, xinput_gamepad_trigger_threshold)
 
-	normalizedGamepad = shared.NormalizedGamepad{
+	normalizedGamepad = NormalizedGamepad{
 		Button_mask: gamepad.button_mask,
 		Tl:          tl,
 		Tr:          tr,
@@ -127,7 +136,7 @@ func normalizeThumb(x, y int16, deadzone float64) (float64, float64, float64) {
 
 var gamepad Gamepad
 
-func GetControllerState() *shared.NormalizedGamepad {
+func GetControllerState() *NormalizedGamepad {
 	result, _, _ := getState.Call(uintptr(0), uintptr(unsafe.Pointer(&gamepad)))
 
 	if result != 0 {

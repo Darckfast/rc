@@ -1,6 +1,10 @@
+//go:build windows
+
 package client
 
 import (
+	"bytes"
+	"encoding/binary"
 	"log"
 	"net"
 	"time"
@@ -18,19 +22,24 @@ func Connect() {
 	}
 	defer conn.Close()
 
-	message := []byte("Hello, UDP!")
-	_, err = conn.Write(message)
-	if err != nil {
-		log.Printf("Send failed: %v", err)
-		return
-	}
+	conn.SetWriteDeadline(time.Now().Add(100 * time.Millisecond))
+	for {
+		state := GetControllerState()
 
-	conn.SetReadDeadline(time.Now().Add(5 * time.Second))
-	buffer := make([]byte, 1024)
-	n, _, err := conn.ReadFromUDP(buffer)
-	if err != nil {
-		log.Printf("Receive error: %v", err)
-		return
+		if state == nil {
+			break
+		}
+		buf := new(bytes.Buffer)
+		err := binary.Write(buf, binary.LittleEndian, state)
+		if err != nil {
+			log.Println("error encoding binary", err)
+			continue
+		}
+
+		_, err = conn.Write(buf.Bytes())
+		if err != nil {
+			log.Printf("Send failed: %v", err)
+			continue
+		}
 	}
-	log.Printf("Server says: %s\n", string(buffer[:n]))
 }

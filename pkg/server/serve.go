@@ -1,8 +1,11 @@
 package server
 
 import (
+	"bytes"
+	"encoding/binary"
 	"log"
 	"net"
+	"rc/shared"
 )
 
 func Serve() {
@@ -30,11 +33,16 @@ func Serve() {
 			continue
 		}
 
-		log.Printf("Got message from %s: %s\n", clientAddr, string(buffer[:n]))
+		var state shared.NormalizedGamepad
 
-		_, err = conn.WriteToUDP(buffer[:n], clientAddr)
+		buf := bytes.NewReader(buffer[:n])
+		err = binary.Read(buf, binary.LittleEndian, &state)
+
 		if err != nil {
-			log.Printf("Write error: %v", err)
+			log.Println("error decoding data", err)
+			continue
 		}
+
+		log.Printf("Got message from %s: %v\n", clientAddr, state)
 	}
 }

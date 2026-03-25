@@ -60,7 +60,7 @@ func init() {
 
 const xinput_gamepad_left_thumb_deadzone = 7849
 const xinput_gamepad_right_thumb_deadzone = 8689
-const xinput_gamepad_trigger_threshold = 30
+const xinput_gamepad_trigger_threshold = 10
 
 var normalizedGamepad shared.NormalizedGamepad
 

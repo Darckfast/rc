@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"rc/shared"
 )
@@ -75,7 +76,7 @@ func Move(gamepad *shared.NormalizedGamepad) {
 	}
 
 	// limits steering to +/- 20k in duty cycle
-	steeringCycle := int(gamepad.Lx * 20_000)
+	steeringCycle := int(math.Round(gamepad.Lx * 20_000))
 
 	log.Printf("%d\n", neutral_duty_cycle+steeringCycle)
 

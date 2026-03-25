@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"rc/shared"
@@ -9,9 +10,9 @@ import (
 const servo_pwm_pin_18 = "/sys/devices/platform/fe6f0010.pwm/pwm/pwmchip1/" // PIN_18
 const esc_pwm_pin_16 = "/sys/devices/platform/fe6f0000.pwm/pwm/pwmchip0/"   // PIN_16
 
-const neutral_duty_cycle = "1500000"
+const neutral_duty_cycle = 1500000
 const polarity = "normal"
-const period = "20000000"
+const period = 20000000
 
 func InitPins() {
 	setInitParams(servo_pwm_pin_18, period, neutral_duty_cycle, polarity)
@@ -21,7 +22,7 @@ func InitPins() {
 	log.Println("esc pwm enabled")
 }
 
-func setInitParams(path, period, neutral_duty_cycle, polarity string) {
+func setInitParams(path string, period uint32, neutral_duty_cycle uint32, polarity string) {
 	_, err := os.Stat(path)
 
 	if err != nil {
@@ -40,13 +41,13 @@ func setInitParams(path, period, neutral_duty_cycle, polarity string) {
 		panic(err)
 	}
 
-	err = os.WriteFile(path+"pwm0/period", []byte(period), 0644)
+	err = os.WriteFile(path+"pwm0/period", []byte(fmt.Sprintf("%d", period)), 0644)
 
 	if err != nil {
 		panic(err)
 	}
 
-	err = os.WriteFile(path+"pwm0/duty_cycle", []byte(neutral_duty_cycle), 0644)
+	err = os.WriteFile(path+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", neutral_duty_cycle)), 0644)
 
 	if err != nil {
 		panic(err)
@@ -67,4 +68,15 @@ func setInitParams(path, period, neutral_duty_cycle, polarity string) {
 
 func Move(gamepad *shared.NormalizedGamepad) {
 	log.Println(gamepad.Lx, gamepad.Ly)
+	if gamepad.Lx > 1 {
+		gamepad.Lx = 1
+	} else if gamepad.Lx < -1 {
+		gamepad.Lx = 1
+	}
+
+	// limits steering to +/- 20k in duty cycle
+	steeringCycle := gamepad.Lx * 20_000
+
+	log.Println(neutral_duty_cycle + steeringCycle)
+
 }

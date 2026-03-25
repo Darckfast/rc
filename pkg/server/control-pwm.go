@@ -100,6 +100,6 @@ func Move(gamepad *shared.NormalizedGamepad) {
 	}
 
 	// limits steering to +/- 2k in duty cycle
-	escCycle := int(math.Round(gamepad.Lx*20_000)) + neutral_duty_cycle
+	escCycle := int(math.Round(gamepad.Tl*20_000)) + neutral_duty_cycle
 	log.Printf("%d\n", escCycle)
 }

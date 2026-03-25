@@ -76,8 +76,19 @@ func Move(gamepad *shared.NormalizedGamepad) {
 	}
 
 	// limits steering to +/- 20k in duty cycle
-	steeringCycle := int(math.Round(gamepad.Lx * 20_000))
+	steeringCycle := int(math.Round(gamepad.Lx*20_000)) + neutral_duty_cycle
 
-	log.Printf("%d\n", neutral_duty_cycle+steeringCycle)
+	if steeringCycle <= 1300000 {
+		steeringCycle = 1300000
+	} else if steeringCycle >= 1700000 {
+		steeringCycle = 1700000
+	}
 
+	log.Printf("%d\n", steeringCycle)
+	err := os.WriteFile(servo_pwm_pin_18+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", steeringCycle)), 0644)
+
+	if err != nil {
+		os.WriteFile(servo_pwm_pin_18+"pwm0/enable", []byte("0"), 0644)
+		panic(err)
+	}
 }

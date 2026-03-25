@@ -99,15 +99,11 @@ func normalizeTrigger(trigger uint8, deadzone float64) (float64, float64) {
 func normalizeThumb(x, y int16, deadzone float64) (float64, float64, float64) {
 	x64 := float64(x)
 	y64 := float64(y)
+
 	magnitude := math.Sqrt((x64 * x64) + (y64 * y64))
 
-	normalizedX := float64(0)
-	normalizedY := float64(0)
-
-	if magnitude > 0 {
-		normalizedX = x64 / magnitude
-		normalizedY = y64 / magnitude
-	}
+	normalizedX := x64 / 32767
+	normalizedY := y64 / 32767
 
 	normalizedMagnitude := float64(0)
 

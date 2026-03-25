@@ -5,5 +5,5 @@ package main
 import "rc/pkg/client"
 
 func main() {
-	client.GetControllerState()
+	client.Connect()
 }

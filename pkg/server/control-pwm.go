@@ -99,25 +99,55 @@ func Move(gamepad *shared.NormalizedGamepad) {
 		gamepad.Tl = -1
 	}
 
-	// limits steering to +/- 2k in duty cycle
-	escCycle := int(math.Round(gamepad.Tl*25_000)) + neutral_duty_cycle
-
-	if escCycle != neutral_duty_cycle {
-		escCycle += 25_000
+	if gamepad.Tr > 1 {
+		gamepad.Tr = 1
+	} else if gamepad.Tr < -1 {
+		gamepad.Tr = -1
 	}
 
-	if escCycle > 1550000 {
-		escCycle = 1550000
-	} else if escCycle < 1450000 {
-		escCycle = 1450000
-	}
+	if gamepad.Tl != 0 { // Reverse
+		// limits steering to +/- 2k in duty cycle
+		escCycle := int(math.Round(gamepad.Tl*-25_000)) + neutral_duty_cycle
 
-	log.Printf("%d\n", escCycle)
-	err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)
+		if escCycle != neutral_duty_cycle {
+			escCycle -= 25_000
+		}
 
-	if err != nil {
-		// disable pwm and exit the process
-		os.WriteFile(esc_pwm_pin_16+"pwm0/enable", []byte("0"), 0644)
-		panic(err)
+		if escCycle > 1550000 {
+			escCycle = 1550000
+		} else if escCycle < 1450000 {
+			escCycle = 1450000
+		}
+
+		log.Printf("%d\n", escCycle)
+		err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)
+
+		if err != nil {
+			// disable pwm and exit the process
+			os.WriteFile(esc_pwm_pin_16+"pwm0/enable", []byte("0"), 0644)
+			panic(err)
+		}
+	} else if gamepad.Tr != 0 { // Forward
+		// limits steering to +/- 2k in duty cycle
+		escCycle := int(math.Round(gamepad.Tr*25_000)) + neutral_duty_cycle
+
+		if escCycle != neutral_duty_cycle {
+			escCycle += 25_000
+		}
+
+		if escCycle > 1550000 {
+			escCycle = 1550000
+		} else if escCycle < 1450000 {
+			escCycle = 1450000
+		}
+
+		log.Printf("%d\n", escCycle)
+		err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)
+
+		if err != nil {
+			// disable pwm and exit the process
+			os.WriteFile(esc_pwm_pin_16+"pwm0/enable", []byte("0"), 0644)
+			panic(err)
+		}
 	}
 }

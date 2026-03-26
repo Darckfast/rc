@@ -110,7 +110,7 @@ func Move(gamepad *shared.NormalizedGamepad) {
 		escCycle := int(math.Round(gamepad.Tl*-25_000)) + neutral_duty_cycle
 
 		if escCycle != neutral_duty_cycle {
-			escCycle -= 25_000
+			escCycle -= 35_000
 		}
 
 		if escCycle > 1550000 {

@@ -15,6 +15,12 @@ const esc_pwm_pin_16 = "/sys/devices/platform/fe6f0000.pwm/pwm/pwmchip0/"   // P
 const neutral_duty_cycle = 1500000
 const polarity = "normal"
 const period = 20000000
+const init_forward_cycle = 35_000
+const init_reverse_cycle = 45_000
+const min_esc_cycle = 1300000
+const max_esc_cycle = 1550000
+const reverse_trigger_cycle = 35_000
+const forward_trigger_cycle = 25_000
 
 var lastPacket time.Time = time.Now()
 
@@ -125,16 +131,16 @@ func Move(gamepad *shared.NormalizedGamepad) {
 
 	if gamepad.Tl != 0 { // Reverse
 		// limits steering to +/- 2k in duty cycle
-		escCycle := int(math.Round(gamepad.Tl*-35_000)) + neutral_duty_cycle
+		escCycle := int(math.Round(gamepad.Tl*-reverse_trigger_cycle)) + neutral_duty_cycle
 
 		if escCycle != neutral_duty_cycle {
-			escCycle -= 40_000
+			escCycle -= init_reverse_cycle
 		}
 
-		if escCycle > 1550000 {
-			escCycle = 1550000
-		} else if escCycle < 1300000 {
-			escCycle = 1300000
+		if escCycle > max_esc_cycle {
+			escCycle = max_esc_cycle
+		} else if escCycle < min_esc_cycle {
+			escCycle = min_esc_cycle
 		}
 
 		err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)
@@ -146,16 +152,16 @@ func Move(gamepad *shared.NormalizedGamepad) {
 		}
 	} else { // Forward
 		// limits steering to +/- 2k in duty cycle
-		escCycle := int(math.Round(gamepad.Tr*25_000)) + neutral_duty_cycle
+		escCycle := int(math.Round(gamepad.Tr*forward_trigger_cycle)) + neutral_duty_cycle
 
 		if escCycle != neutral_duty_cycle {
-			escCycle += 30_000
+			escCycle += init_forward_cycle
 		}
 
-		if escCycle > 1550000 {
-			escCycle = 1550000
-		} else if escCycle < 1300000 {
-			escCycle = 1300000
+		if escCycle > max_esc_cycle {
+			escCycle = max_esc_cycle
+		} else if escCycle < min_esc_cycle {
+			escCycle = min_esc_cycle
 		}
 
 		err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)

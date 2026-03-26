@@ -133,8 +133,8 @@ func Move(gamepad *shared.NormalizedGamepad) {
 
 		if escCycle > 1550000 {
 			escCycle = 1550000
-		} else if escCycle < 1400000 {
-			escCycle = 1400000
+		} else if escCycle < 1300000 {
+			escCycle = 1300000
 		}
 
 		err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)
@@ -154,8 +154,8 @@ func Move(gamepad *shared.NormalizedGamepad) {
 
 		if escCycle > 1550000 {
 			escCycle = 1550000
-		} else if escCycle < 1400000 {
-			escCycle = 1400000
+		} else if escCycle < 1300000 {
+			escCycle = 1300000
 		}
 
 		err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)

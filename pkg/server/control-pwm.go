@@ -127,7 +127,7 @@ func Move(gamepad *shared.NormalizedGamepad) {
 			os.WriteFile(esc_pwm_pin_16+"pwm0/enable", []byte("0"), 0644)
 			panic(err)
 		}
-	} else if gamepad.Tr != 0 { // Forward
+	} else { // Forward
 		// limits steering to +/- 2k in duty cycle
 		escCycle := int(math.Round(gamepad.Tr*25_000)) + neutral_duty_cycle
 

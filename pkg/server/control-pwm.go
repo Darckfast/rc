@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"rc/shared"
+	"time"
 )
 
 const servo_pwm_pin_18 = "/sys/devices/platform/fe6f0010.pwm/pwm/pwmchip1/" // PIN_18
@@ -15,12 +16,28 @@ const neutral_duty_cycle = 1500000
 const polarity = "normal"
 const period = 20000000
 
+var lastPacket time.Time = time.Now()
+
 func InitPins() {
 	setInitParams(servo_pwm_pin_18, period, neutral_duty_cycle, polarity)
 	log.Println("servo pwm enabled")
 
 	setInitParams(esc_pwm_pin_16, period, neutral_duty_cycle, polarity)
 	log.Println("esc pwm enabled")
+
+	ticker := time.NewTicker(100 * time.Millisecond)
+
+	go func() {
+		for range ticker.C {
+			if time.Since(lastPacket) > 100*time.Millisecond {
+				log.Println("no packets received, resetting controls to neutral")
+				os.WriteFile(servo_pwm_pin_18+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", neutral_duty_cycle)), 0644)
+				os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", neutral_duty_cycle)), 0644)
+			}
+		}
+	}()
+
+	log.Println("fail-safe in place, checking every 100ms")
 }
 
 func setInitParams(path string, period uint32, neutral_duty_cycle uint32, polarity string) {
@@ -68,7 +85,6 @@ func setInitParams(path string, period uint32, neutral_duty_cycle uint32, polari
 }
 
 func Move(gamepad *shared.NormalizedGamepad) {
-	log.Println(gamepad.Lx, gamepad.Ly)
 	if gamepad.Lx > 1 {
 		gamepad.Lx = 1
 	} else if gamepad.Lx < -1 {
@@ -119,7 +135,6 @@ func Move(gamepad *shared.NormalizedGamepad) {
 			escCycle = 1400000
 		}
 
-		log.Printf("%d\n", escCycle)
 		err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)
 
 		if err != nil {
@@ -137,11 +152,10 @@ func Move(gamepad *shared.NormalizedGamepad) {
 
 		if escCycle > 1550000 {
 			escCycle = 1550000
-		} else if escCycle < 1450000 {
-			escCycle = 1450000
+		} else if escCycle < 1400000 {
+			escCycle = 1400000
 		}
 
-		log.Printf("%d\n", escCycle)
 		err = os.WriteFile(esc_pwm_pin_16+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", escCycle)), 0644)
 
 		if err != nil {

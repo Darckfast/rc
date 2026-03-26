@@ -29,6 +29,7 @@ func InitPins() {
 
 	go func() {
 		for range ticker.C {
+			log.Println("latency:", time.Since(lastPacket))
 			if time.Since(lastPacket) > 100*time.Millisecond {
 				log.Println("no packets received, resetting controls to neutral")
 				os.WriteFile(servo_pwm_pin_18+"pwm0/duty_cycle", []byte(fmt.Sprintf("%d", neutral_duty_cycle)), 0644)
@@ -85,6 +86,7 @@ func setInitParams(path string, period uint32, neutral_duty_cycle uint32, polari
 }
 
 func Move(gamepad *shared.NormalizedGamepad) {
+	lastPacket = time.Now()
 	if gamepad.Lx > 1 {
 		gamepad.Lx = 1
 	} else if gamepad.Lx < -1 {

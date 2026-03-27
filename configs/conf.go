@@ -7,6 +7,7 @@ type Pwm struct {
 	Min      uint32
 	Polarity string
 	Period   uint32
+	Scale    uint32
 }
 
 type move struct {
@@ -28,20 +29,21 @@ type conf struct {
 var P = conf{
 	Servo: Pwm{
 		Pin:      "/sys/devices/platform/fe6f0010.pwm/pwm/pwmchip1/", // PIN_18
-		Max:      1700000,
-		Min:      1300000,
-		Neutral:  1500000,
+		Max:      1_700_000,
+		Min:      1_300_000,
+		Neutral:  1_500_000,
 		Polarity: "normal",
-		Period:   20000000,
+		Period:   20_000_000,
+		Scale:    200_000,
 	},
 	Esc: esc{
 		Pwm: Pwm{
 			Pin:      "/sys/devices/platform/fe6f0000.pwm/pwm/pwmchip0/", // PIN_16
-			Max:      1600000,
-			Min:      1300000,
-			Neutral:  1500000,
+			Max:      1_600_000,
+			Min:      1_300_000,
+			Neutral:  1_500_000,
 			Polarity: "normal",
-			Period:   20000000,
+			Period:   20_000_000,
 		},
 		Reverse: move{
 			Init:  45_000,

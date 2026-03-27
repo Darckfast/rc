@@ -2,10 +2,5 @@
 go = "1.26"
 
 [tasks]
-start-client = "go run ./client/cmd/main.go"
-build-client = "go build ./client/cmd/main.go -o client"
-start-serve = "go run ./server/cmd/main.go"
-build-serve = "go build ./server/cmd/main.go -o server"
-tidy = "go mod tidy"
-
-
+client = "go run ./client/cmd/main.go"
+serve = "go run ./server/cmd/main.go"

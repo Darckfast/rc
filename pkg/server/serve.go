@@ -45,6 +45,6 @@ func Serve() {
 			continue
 		}
 
-		Move(&state)
+		ApplyControls(&state)
 	}
 }

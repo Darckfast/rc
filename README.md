@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="workers-go" src=".github/images/rc.webp">
+    <img alt="rc" src=".github/images/rc.webp">
     <h1 align="center">rc</h1>
 </p>
 

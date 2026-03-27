@@ -4,8 +4,9 @@
 </p>
 
 <p align="center">
-    **rc** is just a simple implementation of a Xbox Controller -> ESC + Servo control through UDP, using a Radxa Zero 3W (similar to Raspberry Pi Zero)
+ <strong>rc</strong> is just a simple implementation of a Xbox Controller -> ESC + Servo control through UDP, using a Radxa Zero 3W (similar to Raspberry Pi Zero)
 </p>
+
 ---
 
 ## Developing

@@ -7,11 +7,19 @@ import (
 	"encoding/binary"
 	"log"
 	"net"
+	"os"
 	"time"
 )
 
 func Connect() {
-	addr, err := net.ResolveUDPAddr("udp", "10.0.0.35:8080")
+	serverIp := os.Args[1:]
+
+	if len(serverIp) == 0 {
+		log.Println("server-ip is required")
+		os.Exit(1)
+	}
+
+	addr, err := net.ResolveUDPAddr("udp", serverIp[0])
 	if err != nil {
 		panic(err)
 	}
@@ -22,6 +30,7 @@ func Connect() {
 	}
 	defer conn.Close()
 
+	// 60hz
 	ticker := time.NewTicker(time.Second / 60)
 	defer ticker.Stop()
 
@@ -29,8 +38,9 @@ func Connect() {
 		state := GetControllerState()
 
 		if state == nil {
-			break
+			continue
 		}
+
 		buf := new(bytes.Buffer)
 		err := binary.Write(buf, binary.LittleEndian, state)
 		if err != nil {

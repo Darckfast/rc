@@ -5,12 +5,19 @@ import (
 	"encoding/binary"
 	"log"
 	"net"
+	"os"
 	"rc/shared"
 )
 
 func Serve() {
-	addr, err := net.ResolveUDPAddr("udp", "0.0.0.0:8080")
+	serverIp := os.Args[1:]
 
+	if len(serverIp) == 0 {
+		log.Println("binding address is required")
+		os.Exit(1)
+	}
+
+	addr, err := net.ResolveUDPAddr("udp", serverIp[0])
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +33,7 @@ func Serve() {
 
 	InitPins()
 
-	log.Println("Listening to udp://0.0.0.0:8080")
+	log.Println("Listening to udp://" + serverIp[0])
 	for {
 		n, _, err := conn.ReadFromUDP(buffer)
 

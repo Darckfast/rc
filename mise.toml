@@ -3,5 +3,5 @@ go = "1.26"
 
 [tasks]
 client = "go run ./client/cmd/main.go"
-serve = "go run ./server/cmd/main.go"
+server = "go run ./server/cmd/main.go"
 test = "go test ./..."

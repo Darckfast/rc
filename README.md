@@ -27,7 +27,7 @@ PS: The client was made and tested only in Windows 11
 
 
 ```sh
-mise client # starts the client
+mise client <radxa-ip:port> # starts the client
 ```
 
 ### Server
@@ -35,5 +35,5 @@ mise client # starts the client
 This runs in the Radxa, and it read the input from the *client*
 
 ```sh
-mise server
+mise server <binding-address:port> # starts the server
 ```

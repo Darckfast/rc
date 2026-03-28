@@ -124,15 +124,11 @@ func normalizeThumb(x, y int16, deadzone float64) (float64, float64, float64) {
 var gamepad Gamepad
 
 func GetControllerState() *shared.NormalizedGamepad {
-	result, _, err := getState.Call(uintptr(0), uintptr(unsafe.Pointer(&gamepad)))
+	result, _, _ := getState.Call(uintptr(0), uintptr(unsafe.Pointer(&gamepad)))
 
 	if result != 0 {
 		log.Println("controller is not connected")
 		return nil
-	}
-
-	if err != nil {
-		panic(err)
 	}
 
 	return calculateDeadZone(&gamepad)

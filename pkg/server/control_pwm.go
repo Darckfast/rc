@@ -23,7 +23,6 @@ func InitPins() {
 
 	go func() {
 		for range ticker.C {
-			log.Println("latency:", time.Since(lastPacket))
 			if time.Since(lastPacket) > 100*time.Millisecond {
 				log.Println("no packets received, resetting controls to neutral")
 
@@ -95,12 +94,18 @@ func clampFloat64(v, max, min float64) float64 {
 }
 
 func ApplyControls(gamepad *shared.NormalizedGamepad) {
+	log.Println("latency:", time.Since(lastPacket))
 	lastPacket = time.Now()
 
 	gamepad.Lx = clampFloat64(gamepad.Lx, 1, -1)
 	gamepad.Tl = clampFloat64(gamepad.Tl, 1, -1)
 	gamepad.Tr = clampFloat64(gamepad.Tr, 1, -1)
 
+	Steering(gamepad)
+	ForwardOrReverse(gamepad)
+}
+
+func Steering(gamepad *shared.NormalizedGamepad) {
 	steeringCycle := uint32(gamepad.Lx*float64(configs.P.Servo.Scale)) + configs.P.Servo.Neutral
 	steeringCycle = clampUint32(steeringCycle, configs.P.Servo.Max, configs.P.Servo.Min)
 
@@ -111,7 +116,9 @@ func ApplyControls(gamepad *shared.NormalizedGamepad) {
 		os.WriteFile(filepath.Join(configs.P.Servo.Pin, "pwm0/enable"), []byte("0"), 0644)
 		panic(err)
 	}
+}
 
+func ForwardOrReverse(gamepad *shared.NormalizedGamepad) {
 	escCycle := uint32(0)
 	if gamepad.Tr != 0 { // Forward
 		escCycle = uint32(gamepad.Tr*float64(configs.P.Esc.Forward.Scale)) + configs.P.Esc.Neutral
@@ -131,7 +138,7 @@ func ApplyControls(gamepad *shared.NormalizedGamepad) {
 	}
 
 	escCycle = clampUint32(escCycle, configs.P.Esc.Max, configs.P.Esc.Min)
-	err = os.WriteFile(filepath.Join(configs.P.Esc.Pin, "pwm0/duty_cycle"), []byte(fmt.Sprintf("%d", escCycle)), 0644)
+	err := os.WriteFile(filepath.Join(configs.P.Esc.Pin, "pwm0/duty_cycle"), []byte(fmt.Sprintf("%d", escCycle)), 0644)
 
 	if err != nil {
 		// disable pwm and exit the process

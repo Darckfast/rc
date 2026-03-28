@@ -151,7 +151,7 @@ func ApplyControls(gamepad *shared.NormalizedGamepad, size int) {
 	fr := ForwardOrReverse(gamepad)
 
 	log.Printf(
-		"Steering: %-4d | Direction: %-4d | Latency: %-4d ms | Size: %-4d B\n",
+		"Steering: %-4d | Direction: %-4d | Latency: %-6d ms | Size: %-4d B\n",
 		st, fr, latency, size,
 	)
 }

@@ -47,12 +47,11 @@ func Serve() {
 		buf := bytes.NewReader(buffer[:n])
 		err = binary.Read(buf, binary.LittleEndian, &state)
 
-		log.Println("buffer size", n)
 		if err != nil {
 			log.Println("error decoding data", err)
 			continue
 		}
 
-		ApplyControls(&state)
+		ApplyControls(&state, n)
 	}
 }

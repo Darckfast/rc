@@ -93,19 +93,7 @@ func clampFloat64(v, max, min float64) float64 {
 	return v
 }
 
-func ApplyControls(gamepad *shared.NormalizedGamepad) {
-	log.Println("latency:", time.Since(lastPacket))
-	lastPacket = time.Now()
-
-	gamepad.Lx = clampFloat64(gamepad.Lx, 1, -1)
-	gamepad.Tl = clampFloat64(gamepad.Tl, 1, -1)
-	gamepad.Tr = clampFloat64(gamepad.Tr, 1, -1)
-
-	Steering(gamepad)
-	ForwardOrReverse(gamepad)
-}
-
-func Steering(gamepad *shared.NormalizedGamepad) {
+func Steering(gamepad *shared.NormalizedGamepad) uint32 {
 	steeringCycle := uint32(gamepad.Lx*float64(configs.P.Servo.Scale)) + configs.P.Servo.Neutral
 	steeringCycle = clampUint32(steeringCycle, configs.P.Servo.Max, configs.P.Servo.Min)
 
@@ -116,9 +104,11 @@ func Steering(gamepad *shared.NormalizedGamepad) {
 		os.WriteFile(filepath.Join(configs.P.Servo.Pin, "pwm0/enable"), []byte("0"), 0644)
 		panic(err)
 	}
+
+	return steeringCycle
 }
 
-func ForwardOrReverse(gamepad *shared.NormalizedGamepad) {
+func ForwardOrReverse(gamepad *shared.NormalizedGamepad) uint32 {
 	escCycle := uint32(0)
 	if gamepad.Tr != 0 { // Forward
 		escCycle = uint32(gamepad.Tr*float64(configs.P.Esc.Forward.Scale)) + configs.P.Esc.Neutral
@@ -145,4 +135,23 @@ func ForwardOrReverse(gamepad *shared.NormalizedGamepad) {
 		os.WriteFile(configs.P.Esc.Pin+"pwm0/enable", []byte("0"), 0644)
 		panic(err)
 	}
+
+	return escCycle
+}
+
+func ApplyControls(gamepad *shared.NormalizedGamepad, size int) {
+	latency := time.Since(lastPacket)
+	lastPacket = time.Now()
+
+	gamepad.Lx = clampFloat64(gamepad.Lx, 1, -1)
+	gamepad.Tl = clampFloat64(gamepad.Tl, 1, -1)
+	gamepad.Tr = clampFloat64(gamepad.Tr, 1, -1)
+
+	st := Steering(gamepad)
+	fr := ForwardOrReverse(gamepad)
+
+	log.Printf(
+		"Steering: %-4d | Direction: %-4d | Latency: %-4d ms | Size: %-4d B\n",
+		st, fr, latency, size,
+	)
 }

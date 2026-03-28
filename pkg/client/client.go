@@ -48,7 +48,8 @@ func Connect() {
 			continue
 		}
 
-		conn.SetWriteDeadline(time.Now().Add(50 * time.Millisecond))
+		// 16ms
+		conn.SetWriteDeadline(time.Now().Add(15 * time.Millisecond))
 		_, err = conn.Write(buf.Bytes())
 		if err != nil {
 			log.Printf("Send failed: %v", err)

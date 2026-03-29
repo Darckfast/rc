@@ -47,7 +47,7 @@ var P = conf{
 		},
 		Reverse: move{
 			Init:  45_000,
-			Scale: 15_000,
+			Scale: 25_000,
 		},
 		Forward: move{
 			Init:  45_000,

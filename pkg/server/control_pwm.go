@@ -110,8 +110,8 @@ func Steering(gamepad *shared.NormalizedGamepad) uint32 {
 
 func ForwardOrReverse(gamepad *shared.NormalizedGamepad) uint32 {
 	escCycle := uint32(configs.P.Esc.Neutral)
-	if gamepad.Tr != 0 { // Forward
-		escCycle = uint32(gamepad.Tr*float64(configs.P.Esc.Forward.Scale)) + configs.P.Esc.Neutral
+	if gamepad.Tl != 0 { // Forward
+		escCycle = uint32(gamepad.Tl*float64(configs.P.Esc.Forward.Scale)) + configs.P.Esc.Neutral
 
 		if escCycle != configs.P.Esc.Neutral {
 			escCycle += configs.P.Esc.Forward.Init
@@ -119,8 +119,8 @@ func ForwardOrReverse(gamepad *shared.NormalizedGamepad) uint32 {
 	}
 
 	// overwrites forward movement
-	if gamepad.Tl != 0 { // Reverse
-		escCycle = uint32(gamepad.Tl*-float64(configs.P.Esc.Reverse.Scale)) + configs.P.Esc.Neutral
+	if gamepad.Tr != 0 { // Reverse
+		escCycle = uint32(gamepad.Tr*-float64(configs.P.Esc.Reverse.Scale)) + configs.P.Esc.Neutral
 
 		if escCycle != configs.P.Esc.Neutral {
 			escCycle -= configs.P.Esc.Reverse.Init

@@ -29,7 +29,7 @@ func Serve() {
 
 	defer conn.Close()
 
-	buffer := make([]byte, 1024)
+	buffer := make([]byte, 26)
 
 	InitPins()
 
@@ -48,7 +48,7 @@ func Serve() {
 		err = binary.Read(buf, binary.LittleEndian, &state)
 
 		if err != nil {
-			log.Println("error decoding data", err)
+			log.Println("error decoding data", err, n)
 			continue
 		}
 

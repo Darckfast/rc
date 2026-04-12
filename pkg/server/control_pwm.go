@@ -83,7 +83,7 @@ func clampUint32(v, max, min uint32) uint32 {
 	return v
 }
 
-func clampFloat64(v, max, min float64) float64 {
+func clampFloat64(v, max, min float32) float32 {
 	if v > max {
 		return max
 	} else if v < min {
@@ -94,7 +94,7 @@ func clampFloat64(v, max, min float64) float64 {
 }
 
 func Steering(gamepad *shared.NormalizedGamepad) uint32 {
-	steeringCycle := uint32(gamepad.Lx*float64(configs.P.Servo.Scale)) + configs.P.Servo.Neutral
+	steeringCycle := uint32(gamepad.Lx*float32(configs.P.Servo.Scale)) + configs.P.Servo.Neutral
 	steeringCycle = clampUint32(steeringCycle, configs.P.Servo.Max, configs.P.Servo.Min)
 
 	err := os.WriteFile(filepath.Join(configs.P.Servo.Pin, "pwm0/duty_cycle"), []byte(fmt.Sprintf("%d", steeringCycle)), 0644)
@@ -111,7 +111,7 @@ func Steering(gamepad *shared.NormalizedGamepad) uint32 {
 func ForwardOrReverse(gamepad *shared.NormalizedGamepad) uint32 {
 	escCycle := uint32(configs.P.Esc.Neutral)
 	if gamepad.Tr != 0 { // Forward
-		escCycle = uint32(gamepad.Tr*float64(configs.P.Esc.Forward.Scale)) + configs.P.Esc.Neutral
+		escCycle = uint32(gamepad.Tr*float32(configs.P.Esc.Forward.Scale)) + configs.P.Esc.Neutral
 
 		if escCycle != configs.P.Esc.Neutral {
 			escCycle += configs.P.Esc.Forward.Init
@@ -120,7 +120,7 @@ func ForwardOrReverse(gamepad *shared.NormalizedGamepad) uint32 {
 
 	// overwrites forward movement
 	if gamepad.Tl != 0 { // Reverse
-		escCycle = uint32(gamepad.Tl*-float64(configs.P.Esc.Reverse.Scale)) + configs.P.Esc.Neutral
+		escCycle = uint32(gamepad.Tl*-float32(configs.P.Esc.Reverse.Scale)) + configs.P.Esc.Neutral
 
 		if escCycle != configs.P.Esc.Neutral {
 			escCycle -= configs.P.Esc.Reverse.Init

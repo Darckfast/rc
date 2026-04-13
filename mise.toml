@@ -4,4 +4,5 @@ go = "1.26"
 [tasks]
 client = "go run ./client/cmd/main.go"
 server = "go run ./server/cmd/main.go"
+build_server = "mkdir -p build && go build -o ./build/server ./server/cmd/main.go"
 test = "go test ./..."

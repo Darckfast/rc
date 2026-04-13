@@ -11,6 +11,7 @@ import (
 )
 
 var lastPacket time.Time = time.Now()
+var packetUpToDate = false
 
 func InitPins() {
 	setInitParams(&configs.P.Servo)
@@ -24,7 +25,10 @@ func InitPins() {
 	go func() {
 		for range ticker.C {
 			if time.Since(lastPacket) > 100*time.Millisecond {
-				log.Println("no packets received, resetting controls to neutral")
+				if packetUpToDate {
+					packetUpToDate = false
+					log.Println("no packets received, resetting controls to neutral")
+				}
 
 				os.WriteFile(filepath.Join(configs.P.Servo.Pin, "pwm0/duty_cycle"), []byte(fmt.Sprintf("%d", configs.P.Servo.Neutral)), 0644)
 				os.WriteFile(filepath.Join(configs.P.Esc.Pin, "pwm0/duty_cycle"), []byte(fmt.Sprintf("%d", configs.P.Esc.Neutral)), 0644)
@@ -93,9 +97,17 @@ func clampFloat64(v, max, min float32) float32 {
 	return v
 }
 
+var lastServoCycle uint32 = 0
+var lastEscCycle uint32 = 0
+var cycleChanged = false
+
 func Steering(gamepad *shared.NormalizedGamepad) uint32 {
 	steeringCycle := uint32(gamepad.Lx*float32(configs.P.Servo.Scale)) + configs.P.Servo.Neutral
 	steeringCycle = clampUint32(steeringCycle, configs.P.Servo.Max, configs.P.Servo.Min)
+
+	if steeringCycle != lastServoCycle {
+		cycleChanged = true
+	}
 
 	err := os.WriteFile(filepath.Join(configs.P.Servo.Pin, "pwm0/duty_cycle"), []byte(fmt.Sprintf("%d", steeringCycle)), 0644)
 
@@ -128,6 +140,11 @@ func ForwardOrReverse(gamepad *shared.NormalizedGamepad) uint32 {
 	}
 
 	escCycle = clampUint32(escCycle, configs.P.Esc.Max, configs.P.Esc.Min)
+
+	if escCycle != lastEscCycle {
+		cycleChanged = true
+	}
+
 	err := os.WriteFile(filepath.Join(configs.P.Esc.Pin, "pwm0/duty_cycle"), []byte(fmt.Sprintf("%d", escCycle)), 0644)
 
 	if err != nil {
@@ -141,6 +158,7 @@ func ForwardOrReverse(gamepad *shared.NormalizedGamepad) uint32 {
 
 func ApplyControls(gamepad *shared.NormalizedGamepad, size int) {
 	latency := time.Since(lastPacket)
+	packetUpToDate = true
 	lastPacket = time.Now()
 
 	gamepad.Lx = clampFloat64(gamepad.Lx, 1, -1)
@@ -150,8 +168,10 @@ func ApplyControls(gamepad *shared.NormalizedGamepad, size int) {
 	st := Steering(gamepad)
 	fr := ForwardOrReverse(gamepad)
 
-	log.Printf(
-		"Steering: %-4d | Direction: %-4d | Latency: %-6d ms | Size: %-4d B\n",
-		st, fr, latency.Milliseconds(), size,
-	)
+	if cycleChanged {
+		log.Printf(
+			"Steering: %-4d | Direction: %-4d | Latency: %-6d ms | Size: %-4d B\n",
+			st, fr, latency.Milliseconds(), size,
+		)
+	}
 }

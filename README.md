@@ -18,6 +18,8 @@ curl https://mise.run | sh
 ```
 
 ### Client
+#### WIP ESP-32 Version => [rc-esp32](https://github.com/Darckfast/rc-esp32)
+
 
 This service runs where the controller is connected to, via USB-C or Bluetooth
 
